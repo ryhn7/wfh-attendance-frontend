@@ -18,6 +18,7 @@ import {
   IconUserCog,
   IconUserOff,
   IconUsers,
+  IconCalendarEvent
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -74,6 +75,11 @@ export const sidebarData: SidebarData = {
           title: 'Employees',
           url: '/',
           icon: IconUsers,
+        },
+        {
+          title: 'Attendance',
+          url: '/attendance',
+          icon: IconCalendarEvent,
         },
       ],
     },
