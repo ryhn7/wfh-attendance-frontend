@@ -1,13 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
-import { format } from 'date-fns'
-import { useAttendanceToday, useCheckIn, useCheckOut } from '@/services/api'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  useAttendanceHistory,
+  useAttendanceToday,
+  useCheckIn,
+  useCheckOut,
+} from '@/services/api'
+import { format, isSameDay, subDays } from 'date-fns'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import {
   AttendanceCamera,
   AttendanceHistory,
@@ -20,37 +25,62 @@ export default function Attendance() {
   const [checkOutImage, setCheckOutImage] = useState<string | null>(null)
   const [isCapturingCheckIn, setIsCapturingCheckIn] = useState(false)
   const [isCapturingCheckOut, setIsCapturingCheckOut] = useState(false)
+  const [processedHistory, setProcessedHistory] = useState<
+    Array<{
+      date: Date
+      checkIn: string | null
+      checkOut: string | null
+      status: 'checked-in' | 'not-checked-in'
+    }>
+  >([])
 
   const { data: todayAttendance, isLoading: isLoadingAttendance } =
     useAttendanceToday()
   const { checkInMutation } = useCheckIn()
   const { checkOutMutation } = useCheckOut(todayAttendance?.id || '') // Pass the attendance ID to the checkOut mutation
+  const { data: attendanceHistoryData, isLoading: isLoadingHistory } =
+    useAttendanceHistory()
 
-  // const isToday = (date: string | Date) => {
-  //   const today = new Date()
-  //   const target = new Date(date)
-  //   return (
-  //     today.getFullYear() === target.getFullYear() &&
-  //     today.getMonth() === target.getMonth() &&
-  //     today.getDate() === target.getDate()
-  //   )
-  // }
+  // Process attendance history data to match the required format
+  useEffect(() => {
+    if (!attendanceHistoryData) return
 
-  // Mock attendance history data for display purposes
-  const attendanceHistory = [
-    {
-      date: new Date(2025, 4, 10), // May 10, 2025
-      checkIn: '08:15:24',
-      checkOut: '17:30:12',
-      status: 'checked-in' as const,
-    },
-    {
-      date: new Date(2025, 4, 9), // May 9, 2025
-      checkIn: null,
-      checkOut: null,
-      status: 'not-checked-in' as const,
-    },
-  ]
+    const today = new Date()
+    const pastDays: Date[] = []
+
+    // Generate the past 4 days (excluding today)
+    for (let i = 1; i <= 4; i++) {
+      pastDays.push(subDays(today, i))
+    }
+
+    const processedData = pastDays.map((date) => {
+      // Find attendance record for this date
+      const record = attendanceHistoryData.find((record) =>
+        isSameDay(new Date(record.date), date)
+      )
+
+      // Format check-in and check-out times
+      const checkIn = record?.checkInTime
+        ? format(new Date(record.checkInTime), 'HH:mm:ss')
+        : null
+
+      const checkOut = record?.checkOutTime
+        ? format(new Date(record.checkOutTime), 'HH:mm:ss')
+        : null
+
+      // Determine status based on check-in and check-out
+      const status = checkIn && checkOut ? 'checked-in' : 'not-checked-in'
+
+      return {
+        date,
+        checkIn,
+        checkOut,
+        status: status as 'checked-in' | 'not-checked-in',
+      }
+    })
+
+    setProcessedHistory(processedData)
+  }, [attendanceHistoryData])
 
   // Set initial check-in/check-out images from API data when component mounts
   useEffect(() => {
@@ -128,18 +158,6 @@ export default function Attendance() {
     )
   }
 
-  // const checkInTime = todayAttendance?.checkInTime
-  // const checkOutTime = todayAttendance?.checkOutTime
-
-  // const isCheckInToday = checkInTime ? isToday(checkInTime) : false
-  // const isCheckOutToday = checkOutTime ? isToday(checkOutTime) : false
-
-  // const hasCheckedInToday = !!checkInTime && isCheckInToday
-  // const hasCheckedOutToday = !!checkOutTime && isCheckOutToday
-
-  // const allowCheckIn = !hasCheckedInToday
-  // const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
-
   const getCurrentDate = () => {
     return format(new Date(), 'EEEE, MMMM d, yyyy')
   }
@@ -154,7 +172,7 @@ export default function Attendance() {
       </Header>
 
       <Main>
-        <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
+        <div className='mb-8 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Attendance</h2>
             <p className='text-muted-foreground'>{getCurrentDate()}</p>
@@ -270,7 +288,10 @@ export default function Attendance() {
               isLoading={isLoadingAttendance}
             />
 
-            <AttendanceHistory history={attendanceHistory} />
+            <AttendanceHistory
+              history={processedHistory}
+              isLoading={isLoadingHistory}
+            />
           </div>
         </div>
       </Main>

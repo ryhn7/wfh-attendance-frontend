@@ -44,7 +44,7 @@ const AttendanceStatus: React.FC<AttendanceStatusProps> = ({
     <Card>
       <CardHeader className='pb-2'>
         <CardTitle>
-          {isLoading ? <Skeleton className='h-6 w-32' /> : "Today's Status"}
+          {isLoading ? <Skeleton className='h-6 w-32' /> : "Attendance Overview"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -96,7 +96,7 @@ const AttendanceStatus: React.FC<AttendanceStatusProps> = ({
                 </div>
               </div>
 
-              <div className='pt-2'>
+              <div className='pt-26'>
                 <div className='flex items-center justify-between'>
                   <span className='font-medium'>Work Duration</span>
                   <span className='font-mono font-medium'>

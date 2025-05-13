@@ -27,7 +27,7 @@ export default function UserAttendances() {
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>User Attendances</h2>
             <p className='text-muted-foreground'>
-              Manage user attendance records and view their details.
+              Monitor user attendance activity and view submitted records.
             </p>
           </div>
         </div>

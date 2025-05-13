@@ -96,7 +96,7 @@ const AttendanceStatus: React.FC<AttendanceStatusProps> = ({
                 </div>
               </div>
 
-              <div className='pt-2'>
+              <div className='pt-24'>
                 <div className='flex items-center justify-between'>
                   <span className='font-medium'>Work Duration</span>
                   <span className='font-mono font-medium'>

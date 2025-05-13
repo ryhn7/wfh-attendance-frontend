@@ -16,7 +16,10 @@ export const useAttendanceDetail = (
 ) => {
     return useQuery({
         queryKey: ATTENDANCE_QUERY_KEYS.detail(id),
-        queryFn: () => attendanceService.getAttendanceById(id),
+        queryFn: async () => {
+            const response = await attendanceService.getAttendanceById(id);
+            return response.data;
+        },
         enabled: options?.enabled !== false && !!id,
     });
 };

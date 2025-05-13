@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
-
 import { ColumnDef } from '@tanstack/react-table'
 import { AttendanceRecord } from '@/services/api'
 import { toPascalCase } from '@/utils/string'
+import { Badge } from '@/components/ui/badge'
 import LongText from '@/components/long-text'
 import { userTypes } from '../data/data'
 import { DataTableColumnHeader } from './data-table-column-header'
@@ -15,7 +15,7 @@ const cellWrapper = (
 
 export const columns: ColumnDef<AttendanceRecord>[] = [
   {
-    id: 'name', 
+    id: 'name',
     accessorKey: 'user.name',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Name' />
@@ -43,7 +43,7 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
       )
     },
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: false,
   },
   {
     id: 'role',
@@ -67,7 +67,7 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
       )
     },
     filterFn: (row, id, value) => value.includes(row.getValue(id)),
-    enableHiding: true,
+    enableHiding: false,
   },
   {
     accessorKey: 'checkInTime',
@@ -77,12 +77,26 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
     cell: ({ row }) => {
       const time = row.original.checkInTime
       return cellWrapper(
-        time ? format(new Date(time), 'HH:mm:ss') : '-',
+        time ? (
+          <Badge
+            variant='outline'
+            className='border-teal-200 bg-teal-100/30 text-teal-900 dark:text-teal-200'
+          >
+            {format(new Date(time), 'HH:mm:ss')}
+          </Badge>
+        ) : (
+          <Badge
+            variant='outline'
+            className='bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10'
+          >
+            -
+          </Badge>
+        ),
         'center'
       )
     },
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: false,
   },
   {
     accessorKey: 'checkOutTime',
@@ -92,12 +106,20 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
     cell: ({ row }) => {
       const time = row.original.checkOutTime
       return cellWrapper(
-        time ? format(new Date(time), 'HH:mm:ss') : '-',
+        time ? (
+          <Badge variant='outline' className='border-teal-200 bg-teal-100/30 text-teal-900 dark:text-teal-200'>
+            {format(new Date(time), 'HH:mm:ss')}
+          </Badge>
+        ) : (
+          <Badge variant='outline' className='bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10'>
+            -
+          </Badge>
+        ),
         'center'
       )
     },
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: false,
   },
   {
     accessorKey: 'date',
@@ -112,13 +134,16 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
       )
     },
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: false,
   },
   {
     id: 'actions',
     header: () => cellWrapper('Details', 'center'),
     cell: ({ row }) => {
-      return cellWrapper(<ViewAttendanceLink id={row.original.id} />, 'center')
+      return cellWrapper(
+        <ViewAttendanceLink attendanceId={row.original.id} />,
+        'center'
+      )
     },
   },
 ]

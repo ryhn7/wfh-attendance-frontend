@@ -52,7 +52,7 @@ export const sidebarData: SidebarData = {
       title: 'General',
       items: [
         {
-          title: 'Users',
+          title: 'Users Management',
           url: '/',
           icon: IconUsers,
         },

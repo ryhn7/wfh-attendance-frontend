@@ -6,4 +6,5 @@ export * from './useCheckOut';
 export * from './useAttendanceDetail';
 export * from './useAttendanceToday';
 export * from './useAttendances';
+export * from './useAttendanceHistory';
 
