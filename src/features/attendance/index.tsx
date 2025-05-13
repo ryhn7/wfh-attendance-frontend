@@ -1,31 +1,30 @@
+import { useEffect, useRef, useState } from 'react'
+import { format } from 'date-fns'
+import { useAttendanceToday, useCheckIn, useCheckOut } from '@/services/api'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAttendance, useAttendanceDetail } from '@/services/api'
-import { useRef, useState } from 'react'
 import {
   AttendanceCamera,
   AttendanceHistory,
   AttendanceStatus,
 } from './components'
-import { format } from 'date-fns'
 
 export default function Attendance() {
-  const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [checkInImage, setCheckInImage] = useState<string | null>(null)
   const [checkOutImage, setCheckOutImage] = useState<string | null>(null)
   const [isCapturingCheckIn, setIsCapturingCheckIn] = useState(false)
   const [isCapturingCheckOut, setIsCapturingCheckOut] = useState(false)
-  const [attendanceId, setAttendanceId] = useState<string | null>(null)
 
-  const { checkInMutation } = useAttendance()
-  const { data: attendanceDetail } = useAttendanceDetail(attendanceId || '', {
-    enabled: !!attendanceId,
-  })
+  const { data: todayAttendance, isLoading: isLoadingAttendance } =
+    useAttendanceToday()
+  const { checkInMutation } = useCheckIn()
+  const { checkOutMutation } = useCheckOut(todayAttendance?.id || '') // Pass the attendance ID to the checkOut mutation
 
   const isToday = (date: string | Date) => {
     const today = new Date()
@@ -53,6 +52,18 @@ export default function Attendance() {
     },
   ]
 
+  // Set initial check-in/check-out images from API data when component mounts
+  useEffect(() => {
+    if (todayAttendance) {
+      if (todayAttendance.checkInPhotoUrl) {
+        setCheckInImage(todayAttendance.checkInPhotoUrl)
+      }
+      if (todayAttendance.checkOutPhotoUrl) {
+        setCheckOutImage(todayAttendance.checkOutPhotoUrl)
+      }
+    }
+  }, [todayAttendance])
+
   const handleCheckIn = () => {
     setIsCapturingCheckIn(true)
     setIsCapturingCheckOut(false)
@@ -73,36 +84,59 @@ export default function Attendance() {
     checkInMutation.mutate(
       { photo },
       {
-        onSuccess: (data) => {
-          setCheckInImage(imageSrc)
-          setAttendanceId(data.data.id)
+        onSuccess: () => {
+          toast.success('Check-in successful!', {
+            duration: 3000,
+          })
         },
         onError: (err) => {
-          console.error('Check-in failed:', err)
+          toast.error('Check-in failed!, please try again.', {
+            description: err.message,
+            duration: 3000,
+          })
         },
       }
     )
   }
 
-  const checkInTime = attendanceDetail?.data?.checkInTime
-const checkOutTime = attendanceDetail?.data?.checkOutTime
-
-const isCheckInToday = checkInTime ? isToday(checkInTime) : false
-const isCheckOutToday = checkOutTime ? isToday(checkOutTime) : false
-
-const hasCheckedInToday = !!checkInTime && isCheckInToday
-const hasCheckedOutToday = !!checkOutTime && isCheckOutToday
-
-const allowCheckIn = !hasCheckedInToday
-const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
-
-  const handleCheckOutCapture = (imageSrc: string) => {
-    setCheckOutImage(imageSrc)
-    setCheckOutTime(new Date())
+  const handleCheckOutCapture = async (imageSrc: string) => {
     setIsCapturingCheckOut(false)
+
+    // Convert base64 image to File
+    const blob = await (await fetch(imageSrc)).blob()
+    const photo = new File([blob], 'checkout.png', { type: 'image/png' })
+
+    checkOutMutation.mutate(
+      { photo },
+      {
+        onSuccess: () => {
+          toast.success('Check-out successful!', {
+            duration: 3000,
+          })
+        },
+        onError: (err) => {
+          toast.error('Check-out failed!, please try again.', {
+            description: err.message,
+            duration: 3000,
+          })
+        },
+      }
+    )
   }
 
-    const getCurrentDate = () => {
+  const checkInTime = todayAttendance?.checkInTime
+  const checkOutTime = todayAttendance?.checkOutTime
+
+  const isCheckInToday = checkInTime ? isToday(checkInTime) : false
+  const isCheckOutToday = checkOutTime ? isToday(checkOutTime) : false
+
+  const hasCheckedInToday = !!checkInTime && isCheckInToday
+  const hasCheckedOutToday = !!checkOutTime && isCheckOutToday
+
+  const allowCheckIn = !hasCheckedInToday
+  const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
+
+  const getCurrentDate = () => {
     return format(new Date(), 'EEEE, MMMM d, yyyy')
   }
 
@@ -144,7 +178,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
                   <div className='grid grid-cols-2 gap-6'>
                     {/* Left Column (Check-In) */}
                     <div className='flex flex-col space-y-4'>
-                      <div className='flex h-52 w-52 items-center justify-center overflow-hidden rounded-md border mx-auto'>
+                      <div className='mx-auto flex h-52 items-center justify-center overflow-hidden rounded-md border'>
                         {checkInImage ? (
                           <img
                             src={checkInImage}
@@ -152,7 +186,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
                             className='h-full w-full object-cover'
                           />
                         ) : (
-                          <p className='text-sm text-slate-500 text-center'>
+                          <p className='px-4 text-center text-sm text-slate-500'>
                             Check-in photo will appear here
                           </p>
                         )}
@@ -175,7 +209,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
 
                     {/* Right Column (Check-Out) */}
                     <div className='flex flex-col space-y-4'>
-                      <div className='flex h-52 w-52 items-center justify-center overflow-hidden rounded-md border mx-auto'>
+                      <div className='mx-auto flex h-52 items-center justify-center overflow-hidden rounded-md border'>
                         {checkOutImage ? (
                           <img
                             src={checkOutImage}
@@ -183,7 +217,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
                             className='h-full w-full object-cover'
                           />
                         ) : (
-                          <p className='text-sm text-slate-500 text-center'>
+                          <p className='px-4 text-center text-sm text-slate-500'>
                             Check-out photo will appear here
                           </p>
                         )}
@@ -218,17 +252,16 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
           <div className='flex flex-col gap-6'>
             <AttendanceStatus
               checkInTime={
-                attendanceDetail?.data?.checkInTime
-                  ? new Date(attendanceDetail.data.checkInTime)
+                todayAttendance?.checkInTime
+                  ? new Date(todayAttendance.checkInTime)
                   : null
               }
               checkOutTime={
-                attendanceDetail?.data?.checkOutTime
-                  ? new Date(attendanceDetail.data.checkOutTime)
+                todayAttendance?.checkOutTime
+                  ? new Date(todayAttendance.checkOutTime)
                   : null
               }
-              checkInImage={attendanceDetail?.data?.checkInPhotoUrl || null}
-              checkOutImage={attendanceDetail?.data?.checkOutPhotoUrl || null}
+              isLoading={isLoadingAttendance}
             />
 
             <AttendanceHistory history={attendanceHistory} />

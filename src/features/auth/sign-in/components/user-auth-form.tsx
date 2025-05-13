@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { useAuth } from '@/services/api'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { useAuth } from '@/services/api'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -50,11 +50,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   function onSubmit(data: z.infer<typeof formSchema>) {
     loginMutation.mutate(data, {
       onSuccess: (_response) => {
-        toast.success('Login successful!')
+        toast.success('Login successful!', {
+          duration: 3000,
+        })
         navigate({ to: '/' }) // Navigate to root, update this based on your route structure
       },
       onError: (_error) => {
-        toast.error('Login failed. Please check your credentials.')
+        toast.error('Login failed. Please check your credentials.', {
+          duration: 3000,
+        })
       },
     })
   }

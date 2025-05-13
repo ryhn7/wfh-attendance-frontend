@@ -1,13 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { attendanceService } from './attendance';
-
-/**
- * Query keys for attendance detail feature
- */
-export const ATTENDANCE_DETAIL_QUERY_KEYS = {
-    all: ['attendance'] as const,
-    detail: (id: string) => [...ATTENDANCE_DETAIL_QUERY_KEYS.all, 'detail', id] as const,
-};
+import { ATTENDANCE_QUERY_KEYS } from './attendance.keys';
 
 /**
  * Hook for fetching attendance detail by ID
@@ -22,7 +15,7 @@ export const useAttendanceDetail = (
     }
 ) => {
     return useQuery({
-        queryKey: ATTENDANCE_DETAIL_QUERY_KEYS.detail(id),
+        queryKey: ATTENDANCE_QUERY_KEYS.detail(id),
         queryFn: () => attendanceService.getAttendanceById(id),
         enabled: options?.enabled !== false && !!id,
     });
