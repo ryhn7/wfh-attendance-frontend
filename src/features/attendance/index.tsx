@@ -26,15 +26,15 @@ export default function Attendance() {
   const { checkInMutation } = useCheckIn()
   const { checkOutMutation } = useCheckOut(todayAttendance?.id || '') // Pass the attendance ID to the checkOut mutation
 
-  const isToday = (date: string | Date) => {
-    const today = new Date()
-    const target = new Date(date)
-    return (
-      today.getFullYear() === target.getFullYear() &&
-      today.getMonth() === target.getMonth() &&
-      today.getDate() === target.getDate()
-    )
-  }
+  // const isToday = (date: string | Date) => {
+  //   const today = new Date()
+  //   const target = new Date(date)
+  //   return (
+  //     today.getFullYear() === target.getFullYear() &&
+  //     today.getMonth() === target.getMonth() &&
+  //     today.getDate() === target.getDate()
+  //   )
+  // }
 
   // Mock attendance history data for display purposes
   const attendanceHistory = [
@@ -54,6 +54,10 @@ export default function Attendance() {
 
   // Set initial check-in/check-out images from API data when component mounts
   useEffect(() => {
+    // First clear previous images when data changes
+    setCheckInImage(null)
+    setCheckOutImage(null)
+
     if (todayAttendance) {
       if (todayAttendance.checkInPhotoUrl) {
         setCheckInImage(todayAttendance.checkInPhotoUrl)
@@ -124,17 +128,17 @@ export default function Attendance() {
     )
   }
 
-  const checkInTime = todayAttendance?.checkInTime
-  const checkOutTime = todayAttendance?.checkOutTime
+  // const checkInTime = todayAttendance?.checkInTime
+  // const checkOutTime = todayAttendance?.checkOutTime
 
-  const isCheckInToday = checkInTime ? isToday(checkInTime) : false
-  const isCheckOutToday = checkOutTime ? isToday(checkOutTime) : false
+  // const isCheckInToday = checkInTime ? isToday(checkInTime) : false
+  // const isCheckOutToday = checkOutTime ? isToday(checkOutTime) : false
 
-  const hasCheckedInToday = !!checkInTime && isCheckInToday
-  const hasCheckedOutToday = !!checkOutTime && isCheckOutToday
+  // const hasCheckedInToday = !!checkInTime && isCheckInToday
+  // const hasCheckedOutToday = !!checkOutTime && isCheckOutToday
 
-  const allowCheckIn = !hasCheckedInToday
-  const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
+  // const allowCheckIn = !hasCheckedInToday
+  // const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
 
   const getCurrentDate = () => {
     return format(new Date(), 'EEEE, MMMM d, yyyy')
@@ -172,6 +176,8 @@ export default function Attendance() {
                     isCapturingCheckOut={isCapturingCheckOut}
                     onCheckInCapture={handleCheckInCapture}
                     onCheckOutCapture={handleCheckOutCapture}
+                    checkInImage={checkInImage}
+                    checkOutImage={checkOutImage}
                   />
 
                   {/* Check-In / Check-Out Photos and Buttons */}

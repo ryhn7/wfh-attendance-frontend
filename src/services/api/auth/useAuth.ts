@@ -1,13 +1,15 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from './auth';
 import { LoginRequest } from './auth.types';
 import { useAuthStore } from '@/stores/authStore';
+import { ATTENDANCE_QUERY_KEYS } from '../attendance';
 
 /**
  * Hook for login functionality
  */
 export const useAuth = () => {
     const { auth } = useAuthStore();
+    const queryClient = useQueryClient();
 
     /**
      * Login mutation for handling user authentication
@@ -34,6 +36,8 @@ export const useAuth = () => {
      * Logout function that clears authentication state
      */
     const logout = () => {
+        // Invalidate relevant queries when logging out
+        queryClient.invalidateQueries({ queryKey: ATTENDANCE_QUERY_KEYS.all });
         authService.logout();
     };
 

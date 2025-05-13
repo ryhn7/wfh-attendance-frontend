@@ -7,6 +7,8 @@ interface AttendanceCameraProps {
   isCapturingCheckOut: boolean
   onCheckInCapture: (imageSrc: string) => void
   onCheckOutCapture: (imageSrc: string) => void
+  checkInImage?: string | null
+  checkOutImage?: string | null
 }
 
 const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
@@ -14,6 +16,8 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
   isCapturingCheckOut,
   onCheckInCapture,
   onCheckOutCapture,
+  checkInImage,
+  checkOutImage,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -120,7 +124,7 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
       return (
         <div className='bg-muted mx-auto flex h-64 w-full max-w-md items-center justify-center rounded-md border border-dashed'>
           <p className='text-muted-foreground'>
-            Camera preview will appear here
+            {checkInImage && checkOutImage ? 'All done for today!' : 'Camera preview will appear here'}
           </p>
         </div>
       )
