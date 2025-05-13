@@ -18,7 +18,8 @@ import {
   IconUserCog,
   IconUserOff,
   IconUsers,
-  IconCalendarEvent
+  IconCalendarEvent,
+  IconClipboardList,
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -50,31 +51,15 @@ export const sidebarData: SidebarData = {
     {
       title: 'General',
       items: [
-        // {
-        //   title: 'Dashboard',
-        //   url: '/',
-        //   icon: IconLayoutDashboard,
-        // },
-        // {
-        //   title: 'Tasks',
-        //   url: '/tasks',
-        //   icon: IconChecklist,
-        // },
-        // {
-        //   title: 'Apps',
-        //   url: '/apps',
-        //   icon: IconPackages,
-        // },
-        // {
-        //   title: 'Chats',
-        //   url: '/chats',
-        //   badge: '3',
-        //   icon: IconMessages,
-        // },
         {
           title: 'Users',
           url: '/',
           icon: IconUsers,
+        },
+        {
+          title: 'User Attendances',
+          url: '/user-attendances',
+          icon: IconClipboardList,
         },
         {
           title: 'Attendance',
