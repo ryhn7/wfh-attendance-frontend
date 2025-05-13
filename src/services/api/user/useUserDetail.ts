@@ -8,14 +8,14 @@ import { USER_QUERY_KEYS } from './user.keys';
  * @param options Optional query options
  * @returns Query result containing user data
  */
-export const useUser = (
+export const useUserDetail = (
     id: string,
     options?: {
         enabled?: boolean;
     }
 ) => {
     return useQuery({
-        queryKey: USER_QUERY_KEYS.user(id),
+        queryKey: USER_QUERY_KEYS.detail(id),
         queryFn: () => userService.getUserById(id),
         enabled: options?.enabled !== false && !!id,
     });
