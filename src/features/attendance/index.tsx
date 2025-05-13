@@ -138,15 +138,13 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
                     isCapturingCheckOut={isCapturingCheckOut}
                     onCheckInCapture={handleCheckInCapture}
                     onCheckOutCapture={handleCheckOutCapture}
-                    checkInImage={checkInImage}
-                    checkOutImage={checkOutImage}
                   />
 
                   {/* Check-In / Check-Out Photos and Buttons */}
                   <div className='grid grid-cols-2 gap-6'>
                     {/* Left Column (Check-In) */}
                     <div className='flex flex-col space-y-4'>
-                      <div className='flex h-32 items-center justify-center overflow-hidden rounded-md border'>
+                      <div className='flex h-52 w-52 items-center justify-center overflow-hidden rounded-md border mx-auto'>
                         {checkInImage ? (
                           <img
                             src={checkInImage}
@@ -154,7 +152,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
                             className='h-full w-full object-cover'
                           />
                         ) : (
-                          <p className='text-sm text-slate-500'>
+                          <p className='text-sm text-slate-500 text-center'>
                             Check-in photo will appear here
                           </p>
                         )}
@@ -177,7 +175,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
 
                     {/* Right Column (Check-Out) */}
                     <div className='flex flex-col space-y-4'>
-                      <div className='flex h-32 items-center justify-center overflow-hidden rounded-md border'>
+                      <div className='flex h-52 w-52 items-center justify-center overflow-hidden rounded-md border mx-auto'>
                         {checkOutImage ? (
                           <img
                             src={checkOutImage}
@@ -185,7 +183,7 @@ const allowCheckOut = hasCheckedInToday && !hasCheckedOutToday
                             className='h-full w-full object-cover'
                           />
                         ) : (
-                          <p className='text-sm text-slate-500'>
+                          <p className='text-sm text-slate-500 text-center'>
                             Check-out photo will appear here
                           </p>
                         )}

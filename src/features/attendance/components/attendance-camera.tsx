@@ -7,8 +7,6 @@ interface AttendanceCameraProps {
   isCapturingCheckOut: boolean
   onCheckInCapture: (imageSrc: string) => void
   onCheckOutCapture: (imageSrc: string) => void
-  checkInImage: string | null
-  checkOutImage: string | null
 }
 
 const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
@@ -16,12 +14,11 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
   isCapturingCheckOut,
   onCheckInCapture,
   onCheckOutCapture,
-  checkInImage,
-  checkOutImage,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [stream, setStream] = useState<MediaStream | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -36,7 +33,7 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
 
         if (!isMounted) return
 
-        setStream(mediaStream)
+        streamRef.current = mediaStream
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream
         }
@@ -44,14 +41,17 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
         setError(null)
       } catch (err) {
         console.error('Error accessing camera:', err)
-        setError('Unable to access camera. Please ensure you have given permission.')
+        setError(
+          'Unable to access camera. Please ensure you have given permission.'
+        )
       }
     }
 
     const stopCamera = () => {
+      const stream = streamRef.current
       if (stream) {
         stream.getTracks().forEach((track) => track.stop())
-        setStream(null)
+        streamRef.current = null
         if (videoRef.current) {
           videoRef.current.srcObject = null
         }
@@ -117,45 +117,13 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
         </div>
       )
     } else if (!isCapturingCheckIn && !isCapturingCheckOut) {
-      if (checkInImage && !checkOutImage) {
-        return (
-          <div className='mx-auto flex w-full max-w-md flex-col space-y-2'>
-            <p className='text-center text-sm font-medium'>Check-in captured</p>
-            <img
-              src={checkInImage}
-              alt='Check-in'
-              className='border-border w-full rounded-md border shadow-md'
-            />
-          </div>
-        )
-      } else if (checkInImage && checkOutImage) {
-        return (
-          <div className='mx-auto flex w-full max-w-md flex-col space-y-4'>
-            <div>
-              <p className='text-center text-sm font-medium'>Check-in</p>
-              <img
-                src={checkInImage}
-                alt='Check-in'
-                className='border-border w-full rounded-md border shadow-md'
-              />
-            </div>
-            <div>
-              <p className='text-center text-sm font-medium'>Check-out</p>
-              <img
-                src={checkOutImage}
-                alt='Check-out'
-                className='border-border w-full rounded-md border shadow-md'
-              />
-            </div>
-          </div>
-        )
-      } else {
-        return (
-          <div className='bg-muted mx-auto flex h-64 w-full max-w-md items-center justify-center rounded-md border border-dashed'>
-            <p className='text-muted-foreground'>Camera preview will appear here</p>
-          </div>
-        )
-      }
+      return (
+        <div className='bg-muted mx-auto flex h-64 w-full max-w-md items-center justify-center rounded-md border border-dashed'>
+          <p className='text-muted-foreground'>
+            Camera preview will appear here
+          </p>
+        </div>
+      )
     }
   }
 
