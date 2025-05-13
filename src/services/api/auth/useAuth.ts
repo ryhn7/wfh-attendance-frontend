@@ -3,6 +3,7 @@ import { authService } from './auth';
 import { LoginRequest } from './auth.types';
 import { useAuthStore } from '@/stores/authStore';
 import { ATTENDANCE_QUERY_KEYS } from '../attendance';
+import { USER_QUERY_KEYS } from '../user';
 
 /**
  * Hook for login functionality
@@ -38,6 +39,7 @@ export const useAuth = () => {
     const logout = () => {
         // Invalidate relevant queries when logging out
         queryClient.invalidateQueries({ queryKey: ATTENDANCE_QUERY_KEYS.all });
+        queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.all });
         authService.logout();
     };
 

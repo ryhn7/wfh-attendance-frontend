@@ -1,3 +1,4 @@
+import { User as userAPI, useUsers } from '@/services/api/user'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -7,12 +8,13 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersTable } from './components/users-table'
 import UsersProvider from './context/users-context'
-import { userListSchema } from './data/schema'
-import { users } from './data/users'
+import { UsersTableSkeleton } from './components/users-table-skeleton'
 
 export default function Users() {
-  // Parse user list
-  const userList = userListSchema.parse(users)
+  // Fetch users from API
+  const { data: usersResponse, isLoading } = useUsers();
+
+  const userList: userAPI[] = usersResponse ? usersResponse : [];
 
   return (
     <UsersProvider>
@@ -26,15 +28,19 @@ export default function Users() {
       <Main>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Employee List</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
             <p className='text-muted-foreground'>
-              Manage your employees and their roles here.
+              Manage your users and their roles here.
             </p>
           </div>
           <UsersPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <UsersTable data={userList} columns={columns} />
+          {isLoading ? (
+              <UsersTableSkeleton />
+          ) : (
+            <UsersTable data={userList} columns={columns} />
+          )}
         </div>
       </Main>
 

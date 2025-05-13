@@ -1,50 +1,46 @@
 'use client'
 
-import { useState } from 'react'
 import { IconAlertTriangle } from '@tabler/icons-react'
-import { showSubmittedData } from '@/utils/show-submitted-data'
+import { useDeleteUser } from '@/services/api/user'
+import { User as userAPI } from '@/services/api/user'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { User } from '../data/schema'
 
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
-  currentRow: User
+  currentRow: userAPI
 }
 
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
-  const [value, setValue] = useState('')
+  const deleteUserMutation = useDeleteUser()
 
   const handleDelete = () => {
-    if (value.trim() !== currentRow.username) return
-
-    onOpenChange(false)
-    showSubmittedData(currentRow, 'The following user has been deleted:')
+    deleteUserMutation.mutate(currentRow.id, {
+      onSuccess: () => {
+        onOpenChange(false)
+      },
+    })
   }
 
   return (
     <ConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
-      handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.username}
       title={
-        <span className='text-destructive'>
-          <IconAlertTriangle
-            className='stroke-destructive mr-1 inline-block'
-            size={18}
-          />{' '}
+        <span className='text-destructive inline-flex items-center gap-2'>
+          <IconAlertTriangle size={18} />
           Delete User
         </span>
       }
+      handleConfirm={handleDelete}
+      disabled={deleteUserMutation.isPending}
+      isLoading={deleteUserMutation.isPending}
       desc={
-        <div className='space-y-4'>
-          <p className='mb-2'>
+        <div className='flex flex-col gap-2'>
+          <p>
             Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.username}</span>?
+            <span className='font-bold'>{currentRow.name}</span>?
             <br />
             This action will permanently remove the user with the role of{' '}
             <span className='font-bold'>
@@ -53,19 +49,10 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
             from the system. This cannot be undone.
           </p>
 
-          <Label className='my-2'>
-            Username:
-            <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder='Enter username to confirm deletion.'
-            />
-          </Label>
-
           <Alert variant='destructive'>
             <AlertTitle>Warning!</AlertTitle>
             <AlertDescription>
-              Please be carefull, this operation can not be rolled back.
+              Please be careful, this operation cannot be rolled back.
             </AlertDescription>
           </Alert>
         </div>
