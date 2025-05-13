@@ -1,3 +1,4 @@
+// ✅ Updated AttendanceCamera.tsx with refactored camera logic
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
@@ -24,75 +25,69 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Start camera when capturing begins
+    let isMounted = true
+
+    const startCamera = async () => {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        })
+
+        if (!isMounted) return
+
+        setStream(mediaStream)
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream
+        }
+
+        setError(null)
+      } catch (err) {
+        console.error('Error accessing camera:', err)
+        setError('Unable to access camera. Please ensure you have given permission.')
+      }
+    }
+
+    const stopCamera = () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop())
+        setStream(null)
+        if (videoRef.current) {
+          videoRef.current.srcObject = null
+        }
+      }
+    }
+
     if (isCapturingCheckIn || isCapturingCheckOut) {
       startCamera()
     } else {
-      // Stop camera when not capturing
       stopCamera()
     }
 
     return () => {
+      isMounted = false
       stopCamera()
     }
   }, [isCapturingCheckIn, isCapturingCheckOut])
-
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false,
-      })
-
-      setStream(mediaStream)
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream
-      }
-      setError(null)
-    } catch (err) {
-      console.error('Error accessing camera:', err)
-      setError(
-        'Unable to access camera. Please ensure you have given permission.'
-      )
-    }
-  }
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop())
-      setStream(null)
-      if (videoRef.current) {
-        videoRef.current.srcObject = null
-      }
-    }
-  }
 
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current
       const canvas = canvasRef.current
 
-      // Set canvas dimensions to match video
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
 
-      // Draw current video frame to canvas
       const context = canvas.getContext('2d')
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-        // Convert canvas to data URL
         const imageSrc = canvas.toDataURL('image/png')
 
-        // Call appropriate capture handler
         if (isCapturingCheckIn) {
           onCheckInCapture(imageSrc)
         } else if (isCapturingCheckOut) {
           onCheckOutCapture(imageSrc)
         }
-
-        // Stop camera
-        stopCamera()
       }
     }
   }
@@ -157,9 +152,7 @@ const AttendanceCamera: React.FC<AttendanceCameraProps> = ({
       } else {
         return (
           <div className='bg-muted mx-auto flex h-64 w-full max-w-md items-center justify-center rounded-md border border-dashed'>
-            <p className='text-muted-foreground'>
-              Camera preview will appear here
-            </p>
+            <p className='text-muted-foreground'>Camera preview will appear here</p>
           </div>
         )
       }
