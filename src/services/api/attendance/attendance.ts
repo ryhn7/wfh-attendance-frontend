@@ -6,9 +6,11 @@ import { AttendanceRecord, CheckInRequest } from '../index';
  */
 const ENDPOINTS = {
     CHECK_IN: '/attendance/check-in',
+    ATTENDANCES: '/attendance/',
     ATTENDANCE: '/attendance',
     TODAY: '/attendance/today',
     CHECK_OUT: '/attendance/check-out',
+    HISTORY: '/attendance/history',
 };
 
 /**
@@ -84,5 +86,23 @@ export const attendanceService = {
     getTodayAttendance: async () => {
         const response = await api.get<AttendanceRecord>(ENDPOINTS.TODAY);
         return response.data;
-    }
+    },
+
+    /**
+     * Get all attendance records
+     * @returns API response with list of attendance records
+     */
+    getAllAttendances: async (): Promise<AttendanceRecord[]> => {
+        const response = await api.get<AttendanceRecord[]>(ENDPOINTS.ATTENDANCES);
+        return response.data.data;
+    },
+
+    /**
+     * Get attendance history for the current user
+     * @returns API response with attendance history data
+     */
+    getAttendanceHistory: async () => {
+        const response = await api.get<AttendanceRecord[]>(ENDPOINTS.HISTORY);
+        return response.data.data;
+    },
 };

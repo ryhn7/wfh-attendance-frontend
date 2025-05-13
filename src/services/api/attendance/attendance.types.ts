@@ -1,3 +1,6 @@
+import { UserRole } from "../user";
+
+
 /**
  * Attendance API response types
  */
@@ -35,5 +38,5 @@ export interface CheckOutRequest {
 export interface UserInfo {
     email: string;
     name: string;
-
+    role: UserRole;
 }

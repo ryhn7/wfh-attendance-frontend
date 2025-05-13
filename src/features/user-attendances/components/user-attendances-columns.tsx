@@ -1,124 +1,124 @@
+import { format } from 'date-fns'
+
 import { ColumnDef } from '@tanstack/react-table'
-import { User as userAPI } from '@/services/api/user'
-import { cn } from '@/lib/utils'
+import { AttendanceRecord } from '@/services/api'
 import { toPascalCase } from '@/utils/string'
 import LongText from '@/components/long-text'
 import { userTypes } from '../data/data'
 import { DataTableColumnHeader } from './data-table-column-header'
-import { DataTableRowActions } from './data-table-row-actions'
+import { ViewAttendanceLink } from './view-attendance-link'
 
-export const columns: ColumnDef<userAPI>[] = [
-  // {
-  //   id: 'select',
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && 'indeterminate')
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label='Select all'
-  //       className='translate-y-[2px]'
-  //     />
-  //   ),
-  //   meta: {
-  //     className: cn(
-  //       'sticky md:table-cell left-0 z-10 rounded-tl',
-  //       'bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted'
-  //     ),
-  //   },
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label='Select row'
-  //       className='translate-y-[2px]'
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+const cellWrapper = (
+  value: React.ReactNode,
+  align: 'left' | 'right' | 'center' = 'left'
+) => <div className={`px-3 py-2 text-sm text-${align}`}>{value}</div>
+
+export const columns: ColumnDef<AttendanceRecord>[] = [
   {
-    accessorKey: 'name',
+    id: 'name', 
+    accessorKey: 'user.name',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Name' />
     ),
-    cell: ({ row }) => (
-      <LongText className='max-w-36'>{row.getValue('name')}</LongText>
-    ),
-    meta: { className: 'w-36' },
+    cell: ({ row }) => {
+      const name = row.original.user?.name || '-'
+      return cellWrapper(
+        <LongText className='max-w-36'>{name}</LongText>,
+        'center'
+      )
+    },
+    enableSorting: true,
+    enableHiding: false,
   },
   {
     accessorKey: 'email',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Email' />
     ),
-    cell: ({ row }) => (
-      <LongText className='max-w-36'>{row.getValue('email')}</LongText>
-    ),
-    meta: {
-      className: cn(
-        'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)] lg:drop-shadow-none',
-        'bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
-        'sticky left-6 md:table-cell'
-      ),
+    cell: ({ row }) => {
+      const email = row.original.user?.email || '-'
+      return cellWrapper(
+        <div className='max-w-[180px] truncate'>{email}</div>,
+        'center'
+      )
     },
-    enableHiding: false,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
-    accessorKey: 'role',
+    id: 'role',
+    accessorKey: 'user.role',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Role' />
     ),
     cell: ({ row }) => {
-      const { role } = row.original
+      const role = row.original.user?.role || '-'
       const userType = userTypes.find(({ value }) => value === role)
 
-      if (!userType) {
-        return null
-      }
+      if (!userType) return cellWrapper('-', 'center')
 
-      return (
-        <div className='flex items-center gap-x-2'>
+      return cellWrapper(
+        <div className='flex items-center gap-x-2 pl-6'>
           {userType.icon && (
             <userType.icon size={16} className='text-muted-foreground' />
           )}
-          <span className='text-sm capitalize'>
-            {toPascalCase(userType.value)}
-          </span>
+          <span className='capitalize'>{toPascalCase(userType.value)}</span>
         </div>
       )
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-    enableSorting: false,
-    enableHiding: false,
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    enableHiding: true,
   },
-  // {
-  //   accessorKey: 'createdAt',
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title='Created At' />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const date = row.getValue('createdAt') as Date
-  //     return <div>{format(date, 'PPP')}</div>
-  //   },
-  //   enableSorting: true,
-  // },
-  // {
-  //   accessorKey: 'updatedAt',
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title='Updated At' />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const date = row.getValue('updatedAt') as Date
-  //     return <div>{format(date, 'PPP')}</div>
-  //   },
-  //   enableSorting: true,
-  // },
+  {
+    accessorKey: 'checkInTime',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Check In' />
+    ),
+    cell: ({ row }) => {
+      const time = row.original.checkInTime
+      return cellWrapper(
+        time ? format(new Date(time), 'HH:mm:ss') : '-',
+        'center'
+      )
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: 'checkOutTime',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Check Out' />
+    ),
+    cell: ({ row }) => {
+      const time = row.original.checkOutTime
+      return cellWrapper(
+        time ? format(new Date(time), 'HH:mm:ss') : '-',
+        'center'
+      )
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: 'date',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Date' />
+    ),
+    cell: ({ row }) => {
+      const date = row.original.date || row.original.checkInTime
+      return cellWrapper(
+        date ? format(new Date(date), 'dd-MM-yyyy') : '-',
+        'center'
+      )
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
   {
     id: 'actions',
-    cell: DataTableRowActions,
+    header: () => cellWrapper('Details', 'center'),
+    cell: ({ row }) => {
+      return cellWrapper(<ViewAttendanceLink id={row.original.id} />, 'center')
+    },
   },
 ]

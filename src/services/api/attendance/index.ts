@@ -5,4 +5,5 @@ export * from './useCheckIn';
 export * from './useCheckOut';
 export * from './useAttendanceDetail';
 export * from './useAttendanceToday';
+export * from './useAttendances';
 

@@ -1,20 +1,18 @@
-import { User as userAPI, useUsers } from '@/services/api/user'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { AttendanceRecord, useAttendances } from '@/services/api'
 import { columns } from './components/user-attendances-columns'
 import { UserAttendancesDialogs } from './components/user-attendances-dialogs'
-import { UserAttendancesPrimaryButtons } from './components/user-attendances-primary-buttons'
 import { UserAttendancesTable } from './components/user-attendances-table'
 import { UserAttendancesTableSkeleton } from './components/user-attendances-table-skeleton'
 import UserAttendancesProvider from './context/user-attendances-context'
 
 export default function UserAttendances() {
-  // Fetch users from API
-  const { data: usersResponse, isLoading } = useUsers()
+  const { data: attendancesResponse, isLoading } = useAttendances()
 
-  const userList: userAPI[] = usersResponse ? usersResponse : []
+  const userList: AttendanceRecord[] = attendancesResponse ? attendancesResponse : []
   return (
     <UserAttendancesProvider>
       <Header fixed>
@@ -27,12 +25,11 @@ export default function UserAttendances() {
       <Main>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>User Attendances</h2>
             <p className='text-muted-foreground'>
-              Manage your users and their roles here.
+              Manage user attendance records and view their details.
             </p>
           </div>
-          <UserAttendancesPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
           {isLoading ? (

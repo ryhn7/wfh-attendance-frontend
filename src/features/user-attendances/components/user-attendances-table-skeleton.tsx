@@ -17,24 +17,46 @@ export function UserAttendancesTableSkeleton() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='w-[100px] text-center'>
+            {/* Name column */}
+            <TableHead className='text-center'>
               <div className='flex justify-center'>
                 <Skeleton className='h-6 w-16' />
               </div>
             </TableHead>
-            <TableHead className='text-center'>
-              <div className='flex justify-center'>
-                <Skeleton className='h-6 w-24' />
-              </div>
-            </TableHead>
+            {/* Email column */}
             <TableHead className='text-center'>
               <div className='flex justify-center'>
                 <Skeleton className='h-6 w-20' />
               </div>
             </TableHead>
+            {/* Role column */}
             <TableHead className='text-center'>
               <div className='flex justify-center'>
                 <Skeleton className='h-6 w-16' />
+              </div>
+            </TableHead>
+            {/* Check In column */}
+            <TableHead className='text-center'>
+              <div className='flex justify-center'>
+                <Skeleton className='h-6 w-24' />
+              </div>
+            </TableHead>
+            {/* Check Out column */}
+            <TableHead className='text-center'>
+              <div className='flex justify-center'>
+                <Skeleton className='h-6 w-24' />
+              </div>
+            </TableHead>
+            {/* Date column */}
+            <TableHead className='text-center'>
+              <div className='flex justify-center'>
+                <Skeleton className='h-6 w-20' />
+              </div>
+            </TableHead>
+            {/* Details column */}
+            <TableHead className='text-center'>
+              <div className='flex justify-center'>
+                <Skeleton className='h-6 w-20' />
               </div>
             </TableHead>
           </TableRow>
@@ -42,22 +64,43 @@ export function UserAttendancesTableSkeleton() {
         <TableBody>
           {_skeletonRows.map((index) => (
             <TableRow key={`skeleton-${index}`}>
+              {/* Name column */}
               <TableCell className='text-center'>
                 <div className='flex justify-center'>
-                  <Skeleton className='h-6 w-24' />
+                  <Skeleton className='h-6 w-32' />
                 </div>
               </TableCell>
+              {/* Email column */}
               <TableCell className='text-center'>
                 <div className='flex justify-center'>
                   <Skeleton className='h-6 w-48' />
                 </div>
               </TableCell>
+              {/* Role column */}
               <TableCell className='text-center'>
-                <div className='flex items-center justify-center gap-x-2'>
-                  <Skeleton className='h-5 w-5 rounded-full' />
+                <div className='flex justify-center'>
+                  <Skeleton className='h-6 w-24' />
+                </div>
+              </TableCell>
+              {/* Check In column */}
+              <TableCell className='text-center'>
+                <div className='flex justify-center'>
                   <Skeleton className='h-6 w-20' />
                 </div>
               </TableCell>
+              {/* Check Out column */}
+              <TableCell className='text-center'>
+                <div className='flex justify-center'>
+                  <Skeleton className='h-6 w-20' />
+                </div>
+              </TableCell>
+              {/* Date column */}
+              <TableCell className='text-center'>
+                <div className='flex justify-center'>
+                  <Skeleton className='h-6 w-28' />
+                </div>
+              </TableCell>
+              {/* Details column */}
               <TableCell className='text-center'>
                 <div className='flex justify-center'>
                   <Skeleton className='h-8 w-8 rounded-md' />

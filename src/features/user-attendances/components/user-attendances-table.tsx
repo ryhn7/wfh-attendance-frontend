@@ -16,7 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { User as userAPI } from '@/services/api/user'
+import { AttendanceRecord } from '@/services/api'
 import {
   Table,
   TableBody,
@@ -36,8 +36,8 @@ declare module '@tanstack/react-table' {
 }
 
 interface DataTableProps {
-  columns: ColumnDef<userAPI>[] // Use userAPI type
-  data: userAPI[]
+  columns: ColumnDef<AttendanceRecord>[]
+  data: AttendanceRecord[]
 }
 
 export function UserAttendancesTable({ columns, data }: DataTableProps) {
