@@ -2,7 +2,7 @@ import { HTMLAttributes } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@/services/api'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -66,7 +66,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          e.preventDefault()
+          form.handleSubmit(onSubmit)(e)
+        }}
         className={cn('grid gap-3', className)}
         {...props}
       >
@@ -93,12 +96,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
               <FormMessage />
-              <Link
-                to='/forgot-password'
-                className='text-muted-foreground absolute -top-0.5 right-0 text-sm font-medium hover:opacity-75'
-              >
-                Forgot password?
-              </Link>
             </FormItem>
           )}
         />{' '}
