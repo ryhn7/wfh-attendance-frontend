@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, isSameDay } from 'date-fns'
 import { ColumnDef } from '@tanstack/react-table'
 import { AttendanceRecord } from '@/services/api'
 import { toPascalCase } from '@/utils/string'
@@ -107,11 +107,17 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
       const time = row.original.checkOutTime
       return cellWrapper(
         time ? (
-          <Badge variant='outline' className='border-teal-200 bg-teal-100/30 text-teal-900 dark:text-teal-200'>
+          <Badge
+            variant='outline'
+            className='border-teal-200 bg-teal-100/30 text-teal-900 dark:text-teal-200'
+          >
             {format(new Date(time), 'HH:mm:ss')}
           </Badge>
         ) : (
-          <Badge variant='outline' className='bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10'>
+          <Badge
+            variant='outline'
+            className='bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10'
+          >
             -
           </Badge>
         ),
@@ -135,6 +141,33 @@ export const columns: ColumnDef<AttendanceRecord>[] = [
     },
     enableSorting: true,
     enableHiding: false,
+    // Fix date filter to work with dd-MM-yyyy format
+    filterFn: (row, columnId, filterValue) => {
+      // Skip empty filter
+      if (!filterValue) return true
+
+      const rowDate = row.getValue(columnId) as string | null
+      if (!rowDate) return false
+
+      // Handle formatted date string filter
+      if (typeof filterValue === 'string') {
+        try {
+          // For direct text input (dd-MM-yyyy format)
+          if (filterValue.match(/^\d{2}-\d{2}-\d{4}$/)) {
+            return rowDate === filterValue
+          }
+
+          // For date picker (ISO string)
+          const filterDate = new Date(filterValue)
+          const recordDate = new Date(rowDate)
+          return isSameDay(filterDate, recordDate)
+        } catch (_error) {
+          return false
+        }
+      }
+
+      return false
+    },
   },
   {
     id: 'actions',

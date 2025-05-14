@@ -31,6 +31,7 @@ import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticat
 import { Route as AuthenticatedHelpCenterIndexImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAttendanceIndexImport } from './routes/_authenticated/attendance/index'
+import { Route as AuthenticatedAttendanceHistoryIndexImport } from './routes/_authenticated/attendance-history/index'
 import { Route as AuthenticatedAppsIndexImport } from './routes/_authenticated/apps/index'
 import { Route as AuthenticatedSettingsNotificationsImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayImport } from './routes/_authenticated/settings/display'
@@ -163,6 +164,13 @@ const AuthenticatedAttendanceIndexRoute =
   AuthenticatedAttendanceIndexImport.update({
     id: '/attendance/',
     path: '/attendance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
+const AuthenticatedAttendanceHistoryIndexRoute =
+  AuthenticatedAttendanceHistoryIndexImport.update({
+    id: '/attendance-history/',
+    path: '/attendance-history/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -344,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/attendance-history/': {
+      id: '/_authenticated/attendance-history/'
+      path: '/attendance-history'
+      fullPath: '/attendance-history'
+      preLoaderRoute: typeof AuthenticatedAttendanceHistoryIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/attendance/': {
       id: '/_authenticated/attendance/'
       path: '/attendance'
@@ -426,6 +441,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAttendanceAttendanceIdRoute: typeof AuthenticatedAttendanceAttendanceIdRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
+  AuthenticatedAttendanceHistoryIndexRoute: typeof AuthenticatedAttendanceHistoryIndexRoute
   AuthenticatedAttendanceIndexRoute: typeof AuthenticatedAttendanceIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
@@ -440,6 +456,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAttendanceAttendanceIdRoute:
     AuthenticatedAttendanceAttendanceIdRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
+  AuthenticatedAttendanceHistoryIndexRoute:
+    AuthenticatedAttendanceHistoryIndexRoute,
   AuthenticatedAttendanceIndexRoute: AuthenticatedAttendanceIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
@@ -472,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/attendance-history': typeof AuthenticatedAttendanceHistoryIndexRoute
   '/attendance': typeof AuthenticatedAttendanceIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
@@ -499,6 +518,7 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/attendance-history': typeof AuthenticatedAttendanceHistoryIndexRoute
   '/attendance': typeof AuthenticatedAttendanceIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
@@ -529,6 +549,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/attendance-history/': typeof AuthenticatedAttendanceHistoryIndexRoute
   '/_authenticated/attendance/': typeof AuthenticatedAttendanceIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
@@ -560,6 +581,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/apps'
+    | '/attendance-history'
     | '/attendance'
     | '/chats'
     | '/help-center'
@@ -586,6 +608,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/apps'
+    | '/attendance-history'
     | '/attendance'
     | '/chats'
     | '/help-center'
@@ -614,6 +637,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/apps/'
+    | '/_authenticated/attendance-history/'
     | '/_authenticated/attendance/'
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
@@ -682,6 +706,7 @@ export const routeTree = rootRoute
         "/_authenticated/",
         "/_authenticated/attendance/$attendanceId",
         "/_authenticated/apps/",
+        "/_authenticated/attendance-history/",
         "/_authenticated/attendance/",
         "/_authenticated/chats/",
         "/_authenticated/help-center/",
@@ -757,6 +782,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/apps/": {
       "filePath": "_authenticated/apps/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/attendance-history/": {
+      "filePath": "_authenticated/attendance-history/index.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/attendance/": {

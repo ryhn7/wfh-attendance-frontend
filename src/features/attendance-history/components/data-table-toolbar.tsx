@@ -1,79 +1,90 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { CalendarIcon, Cross2Icon } from '@radix-ui/react-icons'
+import { format } from 'date-fns'
+import { Cross2Icon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
-import { userTypes } from '../data/data'
-import { DataTableFacetedFilter } from './data-table-faceted-filter'
+import { CalendarIcon, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { format } from 'date-fns'
-import { cn } from '@/lib/utils'
+import { DataTableFacetedFilter } from './data-table-faceted-filter'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
 }
+
+// Use the underscore prefix for private constants
+const _statusOptions = [
+  {
+    value: 'complete',
+    label: 'Complete',
+    icon: CheckCircle,
+    color: 'text-green-600',
+  },
+  {
+    value: 'in-progress',
+    label: 'In Progress',
+    icon: Clock,
+    color: 'text-amber-600',
+  },
+  {
+    value: 'incomplete',
+    label: 'Incomplete',
+    icon: XCircle,
+    color: 'text-destructive',
+  },
+]
 
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
-    // Format date for display in the date picker
-    const _formatSelectedDate = () => {
-      const dateFilter = table.getColumn('date')?.getFilterValue() as
-        | string
-        | undefined
-  
-      if (!dateFilter) return null
-  
-      try {
-        // If it's already in dd-MM-yyyy format, display as is
-        if (dateFilter.match(/^\d{2}-\d{2}-\d{4}$/)) {
-          return dateFilter
-        }
-  
-        // Otherwise, assume it's an ISO date and format it
-        return format(new Date(dateFilter), 'dd-MM-yyyy')
-      } catch {
-        return null
+  // Format date for display in the date picker
+  const _formatSelectedDate = () => {
+    const dateFilter = table.getColumn('date')?.getFilterValue() as
+      | string
+      | undefined
+
+    if (!dateFilter) return null
+
+    try {
+      // If it's already in dd-MM-yyyy format, display as is
+      if (dateFilter.match(/^\d{2}-\d{2}-\d{4}$/)) {
+        return dateFilter
       }
+
+      // Otherwise, assume it's an ISO date and format it
+      return format(new Date(dateFilter), 'dd-MM-yyyy')
+    } catch {
+      return null
     }
-  
-    // Parse a selected date from calendar picker
-    const _handleDatePickerChange = (date: Date | undefined) => {
-      if (!date) {
-        table.getColumn('date')?.setFilterValue(undefined)
-        return
-      }
-  
-      // Format to ISO 8601 date (midnight UTC of that day)
-      const isoDate = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      ).toISOString()
-  
-      table.getColumn('date')?.setFilterValue(isoDate)
+  }
+
+  // Parse a selected date from calendar picker
+  const _handleDatePickerChange = (date: Date | undefined) => {
+    if (!date) {
+      table.getColumn('date')?.setFilterValue(undefined)
+      return
     }
+
+    // Format to ISO 8601 date (midnight UTC of that day)
+    const isoDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ).toISOString()
+
+    table.getColumn('date')?.setFilterValue(isoDate)
+  }
 
   return (
     <div className='flex items-center justify-between'>
       <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
-        <Input
-          placeholder='Filter user name...'
-          value={
-            (table.getColumn('name')?.getFilterValue() as string) ?? ''
-          }
-          onChange={(event) =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
-          }
-          className='h-8 w-[150px] lg:w-[250px]'
-        />
-                {table.getColumn('date') && (
+        {table.getColumn('date') && (
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -107,15 +118,17 @@ export function DataTableToolbar<TData>({
             </PopoverContent>
           </Popover>
         )}
+
         <div className='flex gap-x-2'>
-          {table.getColumn('role') && (
+          {table.getColumn('status') && (
             <DataTableFacetedFilter
-              column={table.getColumn('role')}
-              title='Role'
-              options={userTypes.map((t) => ({ ...t }))}
+              column={table.getColumn('status')}
+              title='Status'
+              options={_statusOptions}
             />
           )}
         </div>
+
         {isFiltered && (
           <Button
             variant='ghost'
