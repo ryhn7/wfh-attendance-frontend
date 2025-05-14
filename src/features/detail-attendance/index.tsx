@@ -8,7 +8,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { AttendanceStatus } from './components'
+import { DetailAttendanceStatus } from './components'
 
 interface DetailAttendanceProps {
   attendanceId: string
@@ -188,7 +188,7 @@ export default function DetailAttendance({
 
           {/* Right Column - Status & History */}
           <div className='flex flex-col gap-6'>
-            <AttendanceStatus
+            <DetailAttendanceStatus
               checkInTime={
                 data?.checkInTime ? new Date(data.checkInTime) : null
               }

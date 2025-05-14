@@ -11,7 +11,7 @@ interface AttendanceStatusProps {
   isLoading?: boolean
 }
 
-const AttendanceStatus: React.FC<AttendanceStatusProps> = ({
+const DetailAttendanceStatus: React.FC<AttendanceStatusProps> = ({
   checkInTime,
   checkOutTime,
   isLoading = false,
@@ -124,4 +124,4 @@ const formatDuration = (start: Date, end: Date) => {
   return `${String(diffHrs).padStart(2, '0')}:${String(diffMins).padStart(2, '0')}:${String(diffSecs).padStart(2, '0')}`
 }
 
-export default AttendanceStatus
+export default DetailAttendanceStatus

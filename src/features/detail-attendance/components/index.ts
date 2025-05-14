@@ -1,1 +1,1 @@
-export { default as AttendanceStatus } from './attendance-status';
+export { default as DetailAttendanceStatus } from './detail-attendance-status';
