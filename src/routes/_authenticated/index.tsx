@@ -1,6 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Users from '@/features/users'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import Attendance from '@/features/attendance'
 
 export const Route = createFileRoute('/_authenticated/')({
-  component: Users,
+  beforeLoad: () => {
+    // Redirect root path to attendance
+    throw redirect({ to: '/attendance' })
+  },
+  component: Attendance,
 })

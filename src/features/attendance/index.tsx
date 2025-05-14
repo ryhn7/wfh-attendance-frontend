@@ -1,18 +1,18 @@
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useRef, useState } from 'react'
+import { format, isSameDay, subDays } from 'date-fns'
 import {
   useAttendanceHistory,
   useAttendanceToday,
   useCheckIn,
   useCheckOut,
 } from '@/services/api'
-import { format, isSameDay, subDays } from 'date-fns'
-import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ThemeSwitch } from '@/components/theme-switch'
 import {
   AttendanceCamera,
   AttendanceHistory,
@@ -30,7 +30,7 @@ export default function Attendance() {
       date: Date
       checkIn: string | null
       checkOut: string | null
-      status: 'checked-in' | 'not-checked-in'
+      status: 'completed' | 'checked-in' | 'not-checked-in'
     }>
   >([])
 
@@ -46,36 +46,36 @@ export default function Attendance() {
     if (!attendanceHistoryData) return
 
     const today = new Date()
-    const pastDays: Date[] = []
+    const fourDaysAgo = subDays(today, 4)
 
-    // Generate the past 4 days (excluding today)
-    for (let i = 1; i <= 4; i++) {
-      pastDays.push(subDays(today, i))
-    }
+    const filteredData = attendanceHistoryData.filter((record) => {
+      const recordDate = new Date(record.date)
+      return recordDate >= fourDaysAgo && recordDate <= today
+    })
 
-    const processedData = pastDays.map((date) => {
-      // Find attendance record for this date
-      const record = attendanceHistoryData.find((record) =>
-        isSameDay(new Date(record.date), date)
-      )
-
-      // Format check-in and check-out times
-      const checkIn = record?.checkInTime
+    const processedData = filteredData.map((record) => {
+      const date = new Date(record.date)
+      const checkIn = record.checkInTime
         ? format(new Date(record.checkInTime), 'HH:mm:ss')
         : null
-
-      const checkOut = record?.checkOutTime
+      const checkOut = record.checkOutTime
         ? format(new Date(record.checkOutTime), 'HH:mm:ss')
         : null
 
-      // Determine status based on check-in and check-out
-      const status = checkIn && checkOut ? 'checked-in' : 'not-checked-in'
+      let status: 'completed' | 'checked-in' | 'not-checked-in' =
+        'not-checked-in'
+
+      if (checkIn && checkOut) {
+        status = 'completed'
+      } else if (checkIn && isSameDay(date, today)) {
+        status = 'checked-in'
+      }
 
       return {
         date,
         checkIn,
         checkOut,
-        status: status as 'checked-in' | 'not-checked-in',
+        status,
       }
     })
 

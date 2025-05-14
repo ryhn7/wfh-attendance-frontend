@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore'
 import {
   Sidebar,
   SidebarContent,
@@ -11,18 +12,29 @@ import { TeamSwitcher } from '@/components/layout/team-switcher'
 import { sidebarData } from './data/sidebar-data'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = useAuthStore((state) => state.auth.user)
+  const isAdmin = user?.role === 'ADMIN'
+
+  const navGroups = sidebarData.navGroups.filter((group) => {
+    // Filter out Administration group if user is not admin
+    if (group.title === 'Administration' && !isAdmin) {
+      return false
+    }
+    return true
+  })
+
   return (
     <Sidebar collapsible='icon' variant='floating' {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={sidebarData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
+        {navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser  />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

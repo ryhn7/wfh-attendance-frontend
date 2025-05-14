@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@/services/api'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -49,15 +50,23 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     loginMutation.mutate(data, {
-      onSuccess: (_response) => {
+      onSuccess: () => {
         toast.success('Login successful!', {
           duration: 3000,
         })
-        navigate({ to: '/' }) // Navigate to root, update this based on your route structure
+
+        // Get user from auth store after it's been set in the loginMutation
+        const user = useAuthStore.getState().auth.user
+        // Role-based navigation
+        if (user && user.role === 'ADMIN') {
+          navigate({ to: '/admin' }) // Redirect admins to admin dashboard
+        } else {
+          navigate({ to: '/attendance' }) // Redirect regular employees to attendance
+        }
       },
       onError: (_error) => {
         toast.error('Login failed. Please check your credentials.', {
-          duration: 3000,
+          duration: 5000,
         })
       },
     })

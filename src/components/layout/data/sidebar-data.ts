@@ -32,6 +32,21 @@ export const sidebarData: SidebarData = {
   ],
   navGroups: [
     {
+      title: 'Administration',
+      items: [
+        {
+          title: 'Users Management',
+          url: '/admin',
+          icon: IconUsers,
+        },
+        {
+          title: 'User Attendances',
+          url: '/admin/user-attendances',
+          icon: IconClipboardList,
+        },
+      ],
+    },
+    {
       title: 'My Attendance',
       items: [
         {
@@ -43,21 +58,6 @@ export const sidebarData: SidebarData = {
           title: 'Attendance History',
           url: '/attendance-history',
           icon: IconClock,
-        },
-      ],
-    },
-    {
-      title: 'Administration',
-      items: [
-        {
-          title: 'Users Management',
-          url: '/',
-          icon: IconUsers,
-        },
-        {
-          title: 'User Attendances',
-          url: '/user-attendances',
-          icon: IconClipboardList,
         },
       ],
     },

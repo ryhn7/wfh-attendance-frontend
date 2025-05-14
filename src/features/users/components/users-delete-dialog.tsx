@@ -3,6 +3,7 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { useDeleteUser } from '@/services/api/user'
 import { User as userAPI } from '@/services/api/user'
+import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 
@@ -19,6 +20,16 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
     deleteUserMutation.mutate(currentRow.id, {
       onSuccess: () => {
         onOpenChange(false)
+        toast.success('User deleted successfully', {
+          duration: 3000,
+        })
+      },
+      onError: (error) => {
+        toast.error('Failed to delete user', {
+          description:
+            error instanceof Error ? error.message : 'Unknown error occurred',
+          duration: 3000,
+        })
       },
     })
   }

@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { userService } from './user';
 import { USER_QUERY_KEYS } from './user.keys';
 
@@ -15,12 +14,9 @@ export const useDeleteUser = () => {
         onSuccess: () => {
             // Invalidate all user queries to refetch lists
             queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.all });
-            toast.success('User deleted successfully');
         },
         onError: (error) => {
-            toast.error('Failed to delete user', {
-                description: error instanceof Error ? error.message : 'Unknown error occurred',
-            });
+            console.error('Error deleting user:', error);
         },
     });
 };

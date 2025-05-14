@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { userService } from './user';
 import { USER_QUERY_KEYS } from './user.keys';
 import { UpdateUserRequest } from './user.types';
@@ -18,13 +17,10 @@ export const useUpdateUser = (id: string) => {
         onSuccess: () => {
             // Invalidate specific queries
             queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.all });
-            queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.user(id) });
-            toast.success('User updated successfully');
+            queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.detail(id) });
         },
         onError: (error) => {
-            toast.error('Failed to update user', {
-                description: error instanceof Error ? error.message : 'Unknown error occurred',
-            });
+            console.error('Error updating user:', error);
         },
     });
 };

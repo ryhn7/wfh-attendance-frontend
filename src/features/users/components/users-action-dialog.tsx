@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { userTypes } from '../data/data'
+import { toast } from 'sonner'
 
 const formSchema = z
   .object({
@@ -100,6 +101,18 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           onSuccess: () => {
             form.reset()
             onOpenChange(false)
+            toast.success('User updated successfully', {
+              duration: 3000,
+            })
+          },
+          onError: (error) => {
+            toast.error('Failed to update user', {
+              description:
+                error instanceof Error
+                  ? error.message
+                  : 'Unknown error occurred',
+              duration: 3000,
+            })
           },
         }
       )
@@ -116,6 +129,18 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           onSuccess: () => {
             form.reset()
             onOpenChange(false)
+            toast.success('User added successfully', {
+              duration: 3000,
+            })
+          },
+          onError: (error) => {
+            toast.error('Failed to add user', {
+              description:
+                error instanceof Error
+                  ? error.message
+                  : 'Unknown error occurred',
+              duration: 3000,
+            })
           },
         }
       )
@@ -232,7 +257,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
         </div>
         <DialogFooter>
           <Button type='submit' form='user-form' disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Save changes'}
+            {isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Add User'}
           </Button>
         </DialogFooter>
       </DialogContent>
